@@ -41,24 +41,15 @@ void MPU6050_Imu::calibrate(){
     Serial.println("Calibrating Gyro Offset");
     #endif
 
-    Vector3D sum_gyro = {.x = 0.0, .y = 0.0, .z = 0.0};
+    MSVector3 sum_gyro = MSVector3(0,0,0);
 
     int samples = 2000;
     for (int i=0; i<samples; i++){
         ImuData data = imu_read();
-        sum_gyro.x += data.gyro.x;
-        sum_gyro.y += data.gyro.y;
-        sum_gyro.z += data.gyro.z;
+        sum_gyro = sum_gyro + data.gyro;
         delay(1);
-        /*
-        RollOffset += data.MRoll;
-        PitchOffset += data.MPitch;
-        YawOffset += data.MYaw;
-        */
     }
-    gyro_offset.x = sum_gyro.x/samples;
-    gyro_offset.y = sum_gyro.y/samples;
-    gyro_offset.z = sum_gyro.z/samples;
+    gyro_offset = sum_gyro*(1.0f/samples);
 
     #if IMU_DEBUG
     Serial.printf("gyro offset: %f  %f  %f", gyro_offset.x, gyro_offset.y, gyro_offset.z);
@@ -93,15 +84,17 @@ ImuData MPU6050_Imu::imu_read(){
 
     // Calculate angular velocities  IMPORTANT: Roll and Pitch are assigned to Y and X respectively,
     // Because of how I mount my gyro 
-    data.gyro.x = (float)gyroX/131.0 - gyro_offset.x;             // convention: right roll = positive
-    data.gyro.y = (float)gyroY/131.0 - gyro_offset.y;         // convention: up pitch = positive
-    data.gyro.z = (float)gyroZ/131.0 - gyro_offset.z;      // convention: right yaw = positive
+    data.gyro.x = (float)gyroX/131.0 * gyro_remap.x;             // convention: right roll = positive
+    data.gyro.y = (float)gyroY/131.0 * gyro_remap.y;         // convention: up pitch = positive
+    data.gyro.z = (float)gyroZ/131.0 * gyro_remap.z;      // convention: right yaw = positive
 
     // Calculate accelerometer data
-    data.accel.x = (float)accelX/16384.0 - accel_offset.x;
-    data.accel.y = (float)accelY/16384.0 - accel_offset.y;
-    data.accel.z = (float)accelZ/16384.0 - accel_offset.z;
+    data.accel.x = ((float)accelX/16384.0 - accel_offset.x)*accel_remap.x;
+    data.accel.y = ((float)accelY/16384.0 - accel_offset.y)*accel_remap.y;
+    data.accel.z = ((float)accelZ/16384.0 - accel_offset.z)*accel_remap.z;
     
+    data.gyro = data.gyro * (M_PI/180.0f) - gyro_offset;
+    //data.accel = data.accel * 9.81;
     #if IMU_DEBUG
     if (millis() - last_debug > 40){
         last_debug = millis();
