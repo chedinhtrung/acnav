@@ -36,19 +36,16 @@ void QEskf::propagate(MSVector3 gyro, float dt){
     error_state.propagate(state, gyro, dt);
     
     BLA::Matrix<3,3,float> F = (gyro * dt).to_dq().T().to_R();
-
-    
-
-    BLA::Matrix<3,3,float> P_i;
     
     // Covar matrix P propagate 
-    P = ~F * P * F + Q;
+    P = (~F) * P * F + Q;
 }
 
 void QEskf::update(MSVector3 accel){
     MSVector3 g(0.0f,0.0f,-1.0f);
 
-    float lin_accel_var = accel * accel - 1;
+    float lin_accel_mag = accel.norm();
+    float lin_accel_var = (lin_accel_mag - 1.0) * (lin_accel_mag - 1.0);
 
     BLA::Matrix<3,3,float> V = Ra + lin_accel_var*BLA::Eye<3,3,float>();
 
@@ -58,7 +55,7 @@ void QEskf::update(MSVector3 accel){
     BLA::Matrix<3,3,float> K = P * (~H) * BLA::Inverse((H*P*(~H) + V));
     
     BLA::Matrix<3,1,float>& current_error_state = error_state.as_BlaVec();
-    current_error_state = current_error_state + K * (accel - RT_v).as_BlaVec();
+    current_error_state += K * (accel - RT_v).as_BlaVec();
 
     BLA::Eye<3,3,float> I;
     P = (I - K*H) * P * (~(I - K*H)) + K * V *(~K);

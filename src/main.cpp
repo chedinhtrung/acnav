@@ -29,7 +29,6 @@ void setup() {
   Wire.setClock(400000);
   delay(4000);
   imu.setup();
-  eskf.KF_DT = DT*1e-3;
   /*
   eskf.state.state.q = Quaternion(1,0,0,0);
   eskf.state.state.ab = MSVector3(0,0,0);
@@ -56,7 +55,7 @@ void loop() {
     //Serial.write((byte*)&imud, sizeof(ImuData));
     eskf.propagate(imud.gyro, DT*1e-3);
     eskf.update(imud.accel);
-     delta = micros()-readtime;
+    delta = micros()-readtime;
   }
   
   if (millis() - last_update > 50){

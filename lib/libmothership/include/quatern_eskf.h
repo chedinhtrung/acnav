@@ -54,7 +54,7 @@ struct QEskf {
     QErrorState error_state;
     
     float accel_var = (0.01f)*(0.01f);        // acceleration variance (for measurement only) 
-    float gyro_var = (10.0f/180*M_PI)*(10.0f/180*M_PI);         // Theta_i
+    float gyro_var = (1.0f/180*M_PI)*(1.0f/180*M_PI);         // Theta_i
     float flat_var = (6.0f/180.0f*M_PI)*(6.0f/180.0f*M_PI); // initial flatness covariance of 2 degrees
 
     float KF_DT = 4.0f*1e-3;
