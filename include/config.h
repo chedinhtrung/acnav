@@ -1,1 +1,1 @@
-#define DT 2.0 // Millisec after each IMU updates 
+#define DT 4.0 // Millisec after each IMU updates 

@@ -48,25 +48,18 @@ void loop() {
   
   if (kf_run) {
     kf_run = false;
-    unsigned long imu_last_read = imu.last_read;
     ImuData imud = imu.imu_read();
+    //Serial.write((byte*)&imud, sizeof(ImuData));
     eskf.propagate(imud.gyro, DT*1e-3);
-    //eskf.update(imud.accel);
+    eskf.update(imud.accel);
   }
   
   if (millis() - last_update > 30){
     last_update = millis();
     
-    /*
-    Serial.printf("%f %f %f %f", 
-      eskf.state.state.q.w, eskf.state.state.q.i, eskf.state.state.q.j, eskf.state.state.q.k);
-      */
-    MSVector3 gv = eskf.state.state.q.T().rotate(MSVector3(0.0f,0.0f,1.0f));
-    //gv.print(buf);
-    //Serial.println(buf);
-    //Serial.printf("%f %f %f %f %f %f %f %f %f",
-    //eskf.P(0,0), eskf.P(1,1),eskf.P(2,2),eskf.P(3,3),eskf.P(4,4),eskf.P(5,5),eskf.P(6,6),eskf.P(7,7),eskf.P(8,8));
-    //Serial.println();
+    MSVector3 euler = eskf.state.q.to_euler()*(180.0f/M_PI);
+    euler.print(buf);
+    Serial.println(buf);
     
   }
     

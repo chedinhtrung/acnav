@@ -122,3 +122,16 @@ MSVector3 Quaternion::rotate(MSVector3 v) const{
     Quaternion res = nq * vq * (nq.T());
     return MSVector3(res.i, res.j, res.k);
 }
+
+MSVector3 Quaternion::to_euler(){
+    float psi = atan2f(2.0*(w*k + i*j), 1.0 - 2.0*(j*j + k*k));
+    
+    float sin_theta = 2.0*(w*j - k*i);
+    if (sin_theta > 1) {sin_theta = 1.0f;}
+    else if (sin_theta < -1){sin_theta = -1.0f;}
+
+    float theta = asinf(sin_theta);
+    float phi = atan2f(2.0f*(w*i + j*k), 1.0f - 2.0f*(i*i + j*j));
+
+    return MSVector3(psi, theta, phi);
+}

@@ -6,7 +6,7 @@
 #ifndef MPU6050 
 #define MPU6050 
 
-#define IMU_DEBUG 1
+#define IMU_DEBUG 0
 
 struct RawImuData {
     int16_t x;

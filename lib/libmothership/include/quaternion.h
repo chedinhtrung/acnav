@@ -42,6 +42,8 @@ struct Quaternion {
     MSVector3 vec() const;
     BLA::Matrix<3,3,float> to_R() const;      // converts to rotation matrix
     MSVector3 rotate(MSVector3 v) const;
+
+    MSVector3 to_euler();
 };
 
 
