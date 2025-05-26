@@ -47,7 +47,7 @@ struct MSVector3 {
     void normize();
     float norm();
     MSVector3 cross(MSVector3 v);
-    Quaternion to_dq();
+    Quaternion to_dq();         // Stable conversion to quaternion for small angles
     BLA::Matrix<3,3,float> to_skewsymL();
 };
 

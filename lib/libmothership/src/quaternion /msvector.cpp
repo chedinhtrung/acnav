@@ -69,9 +69,13 @@ MSVector3 MSVector3::cross(MSVector3 v){
 }
 
 Quaternion MSVector3::to_dq(){
-    float mag = norm();
-    MSVector3 u_sin = *this * (1.0f/mag) * sin(mag/2);
-    return Quaternion(cos(mag/2.0f), u_sin.x, u_sin.y, u_sin.z);
+    float phi = norm();
+    if (phi < 1e-7f){
+        return Quaternion(1, x/2.0f, y/2.0f, z/2.0f);   // Stable conversion to quaternion for small angles
+    }
+    
+    MSVector3 u_sinphi = *this * (1.0f/phi) * sinf(phi/2.0f);
+    return Quaternion(cosf(phi/2.0f), u_sinphi.x, u_sinphi.y, u_sinphi.z);
 }
 
 BLA::Matrix<3,3,float> MSVector3::to_skewsymL(){

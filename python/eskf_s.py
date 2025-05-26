@@ -36,7 +36,7 @@ class State:
 
 class ErrorState:
     def __init__(self):
-        self.statevect = np.zeros((3,1), dtype="float")
+        self.statevect = np.zeros((3,1), dtype=np.float32)
     
     @property 
     def dtheta(self):
@@ -51,7 +51,7 @@ class ErrorState:
         self.dtheta = quaternion.rotate_vectors(RT, self.dtheta.flatten()).reshape((3,1))
     
     def reset(self):
-        self.statevect = np.zeros((3,1), dtype="float")
+        self.statevect = np.zeros((3,1), dtype=np.float32)
 
 class Eskf: 
     def __init__(self):
@@ -93,15 +93,16 @@ class Eskf:
         linear_accel_var = np.square(np.linalg.norm(accel) - 1)
         V = self.accel_var + linear_accel_var * np.eye(3,3)
 
-        RT_q_g = quaternion.rotate_vectors(self.state.q.conjugate(), np.array([0,0,-1], dtype="float"))
+        RT_q_g = quaternion.rotate_vectors(self.state.q.conjugate(), np.array([0,0,-1], dtype=np.float32))
 
         H = skew(RT_q_g)
 
         K = self.P @ H.T @ np.linalg.inv((H @ self.P @ H.T + V))
         self.error_state.statevect += K @ (accel - (RT_q_g.reshape(3,1)))
-        I = np.eye(3,3, dtype="float")
+        I = np.eye(3,3, dtype=np.float32)
         self.P = (I - K @ H) @ self.P @ (I - K @ H).T + K @ V @ K.T
 
+    def inject(self):
         self.state.update(self.error_state)
         self.error_state.reset()
 

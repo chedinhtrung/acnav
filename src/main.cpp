@@ -39,25 +39,33 @@ void setup() {
 }
 
 unsigned long last_update = millis();
-unsigned long last_gyro = micros();
 
 unsigned long readtime = micros();
+
+unsigned long delta = 0;
+
+unsigned long euler_time = micros();
 
 char buf[30];
 void loop() {
   
   if (kf_run) {
+    readtime = micros();
     kf_run = false;
     ImuData imud = imu.imu_read();
     //Serial.write((byte*)&imud, sizeof(ImuData));
     eskf.propagate(imud.gyro, DT*1e-3);
     eskf.update(imud.accel);
+     delta = micros()-readtime;
   }
   
-  if (millis() - last_update > 30){
+  if (millis() - last_update > 50){
     last_update = millis();
-    
+    euler_time = micros();
     MSVector3 euler = eskf.state.q.to_euler()*(180.0f/M_PI);
+
+    unsigned long delta_euler = micros() - euler_time;
+    Serial.printf("%i  %i ", delta, delta_euler);
     euler.print(buf);
     Serial.println(buf);
     

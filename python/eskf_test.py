@@ -39,4 +39,6 @@ while True:
         last_read = time.perf_counter()
         euler = quat_to_euler_zyx(eskf.state.q) * 180 / 3.14159
         print(euler) 
-        #print(eskf.state.wb)
+        #print(eskf.error_state.dtheta)
+    
+    eskf.inject()
