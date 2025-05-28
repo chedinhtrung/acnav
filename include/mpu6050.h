@@ -22,7 +22,7 @@ struct ImuData {
 class MPU6050_Imu {
     private: 
         MSVector3 gyro_offset;
-        MSVector3 accel_offset = MSVector3(0.05f,0.0f,0.13f);
+        MSVector3 accel_offset = MSVector3(0.016f,-0.0015f,0.124f);
         MSVector3 gyro_remap = MSVector3(1,-1,-1);
         MSVector3 accel_remap = MSVector3(1,-1,-1);
         unsigned long last_debug = millis(); 
