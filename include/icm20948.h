@@ -1,33 +1,23 @@
-#include <Wire.h>
-#include "datastructs.h"
-#include <msvector.h>
+#ifndef ICM20948_IMU
+#define ICM20948_IMU
 #include "imu.h"
-#define MPU6050_ADDR 0x68
-#ifndef MPU6050 
-#define MPU6050 
+#include <Wire.h>
 
-class MPU6050_Imu {
+#define ICM20948_ADDR 0x68
+
+class ICM20948 {
     private: 
         MSVector3 gyro_offset;
-        
-       
-        # ifdef REFERENCE
-        MSVector3 accel_offset = MSVector3(0.019f,0.0005f,0.118f);
-        #endif
-        #ifdef MEASURE
         MSVector3 accel_offset = MSVector3(0.05f,0.0f,0.13f);
-        #endif
         MSVector3 gyro_remap = MSVector3(1,-1,-1);
         MSVector3 accel_remap = MSVector3(1,-1,-1);
         unsigned long last_debug = millis(); 
     public: 
         unsigned long last_read = micros();
-        MPU6050_Imu();
+        ICM20948();
         void setup();
         ImuData imu_read();
         void calibrate();
 };
 
-
-
-#endif
+#endif 

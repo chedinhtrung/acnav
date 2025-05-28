@@ -2,8 +2,11 @@
 #include <Wire.h>
 #include "mpu6050.h"
 #include "config.h"
-
+#include "WiFi.h"
 #include <quatern_eskf.h>
+#include "remote_sensor.h"
+
+#define EULER_DEBUG 0
 
 hw_timer_t *timer = NULL;
 volatile bool kf_run = false;
@@ -15,9 +18,11 @@ QEskf eskf;
 
 MPU6050_Imu imu;
 
-float angle = 0;
+RemoteSensor meas;
 
 void setup() {
+  WiFi.mode(WIFI_STA);
+
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onKFTrigger, true);
   timerAlarmWrite(timer, DT*1000, true);
@@ -29,11 +34,14 @@ void setup() {
   Wire.setClock(400000);
   delay(4000);
   imu.setup();
-  /*
-  eskf.state.state.q = Quaternion(1,0,0,0);
-  eskf.state.state.ab = MSVector3(0,0,0);
-  eskf.state.state.gb = MSVector3(0,0,0);
-  */
+
+  // Find MAC address
+  //WiFi.mode(WIFI_STA);  // Important for getting the STA MAC
+  //Serial.print("MAC Address (STA): ");
+  //Serial.println(WiFi.macAddress());
+  //delay(40000);
+
+  meas.init();
   
 }
 
@@ -61,12 +69,12 @@ void loop() {
   if (millis() - last_update > 50){
     last_update = millis();
     euler_time = micros();
+    
+    #if EULER_DEBUG
     MSVector3 euler = eskf.state.q.to_euler()*(180.0f/M_PI);
-
-    unsigned long delta_euler = micros() - euler_time;
-    Serial.printf("%i  %i ", delta, delta_euler);
     euler.print(buf);
     Serial.println(buf);
+    #endif
     
   }
     
