@@ -6,7 +6,7 @@
 #include <quatern_eskf.h>
 #include "remote_sensor.h"
 
-#define EULER_DEBUG 0
+#define EULER_DEBUG 1
 
 hw_timer_t *timer = NULL;
 volatile bool kf_run = false;

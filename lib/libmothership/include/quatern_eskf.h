@@ -57,7 +57,7 @@ struct QEskf {
     float gyro_var = (1.0f/180*M_PI)*(1.0f/180*M_PI);         // Theta_i
     float flat_var = (6.0f/180.0f*M_PI)*(6.0f/180.0f*M_PI); // initial flatness covariance of 2 degrees
 
-    float KF_DT = 4.0f*1e-3;
+    const float KF_DT = 4.0f*1e-3;
 
     public:
     QEskf();

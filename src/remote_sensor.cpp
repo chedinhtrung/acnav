@@ -1,6 +1,8 @@
 #include "remote_sensor.h"
 #include "Arduino.h"
 
+#define COMM_DEBUG 0
+
 RemoteSensor* RemoteSensor::instance = nullptr;
 
 esp_err_t RemoteSensor::init(){
@@ -38,10 +40,13 @@ esp_err_t RemoteSensor::init(){
 void RemoteSensor::onDataReceive(const uint8_t* mac, const uint8_t* data, int len){
     if (len == sizeof(Quaternion)){
         memcpy(&(instance->q), data, sizeof(Quaternion));
+
+        #if COMM_DEBUG
         MSVector3 euler = instance->q.to_euler()*(180.0f/M_PI);
         char buf[50];
         euler.print(buf);
         Serial.println(buf);
+        #endif
     }
 }
 
