@@ -94,8 +94,8 @@ class Eskf:
 
         self.P = self.F.T @ self.P @ self.F + self.Q
 
-        if self.P[2][2] > 5e-7:
-            self.P[2][2] = 5e-7
+        if self.P[2][2] > 1e-6:
+            self.P[2][2] = 1e-6
 
     def update(self, accel:np.array):
         linear_accel_var = np.square(np.linalg.norm(accel) - 1)
