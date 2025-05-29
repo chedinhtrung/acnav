@@ -36,9 +36,14 @@ while True:
     eskf.propagate(npdata[:3].reshape(3,1), DT)
     eskf.update(npdata[3:].reshape((3,1)))
     if elapsed > 50*1e-3:
+        print("\033[2J\033[H", end='')
         last_read = time.perf_counter()
         euler = quat_to_euler_zyx(eskf.state.q) * 180 / 3.14159
-        print(euler) 
+        print(f"\r{eskf.P} \n \n",end='', flush=True)
+        print(f"\r{eskf.H} \n \n",end='', flush=True)
+        print(f"\r{eskf.state.q} \n \n",end='', flush=True)
+        print(f"\r{euler} \n \n",end='', flush=True)
         #print(eskf.error_state.dtheta)
+        #print(f"{eskf.max_index}   {eskf.debug_froben_norm}")
     
     eskf.inject()
