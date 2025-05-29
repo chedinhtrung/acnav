@@ -68,7 +68,7 @@ void loop() {
 
     eskf.propagate(imud.gyro, DT*1e-3);
     eskf.update(imud.accel);
-    delta = micros()-readtime;
+    //delta = micros()-readtime;
   }
   
   if (millis() - last_update > 50){
