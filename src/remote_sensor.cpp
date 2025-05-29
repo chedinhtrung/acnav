@@ -4,6 +4,7 @@
 #define COMM_DEBUG 0
 
 RemoteSensor* RemoteSensor::instance = nullptr;
+bool RemoteSensor::meas_lock = false;
 
 esp_err_t RemoteSensor::init(){
     
@@ -39,6 +40,7 @@ esp_err_t RemoteSensor::init(){
 
 void RemoteSensor::onDataReceive(const uint8_t* mac, const uint8_t* data, int len){
     if (len == sizeof(Quaternion)){
+        meas_lock = true;
         memcpy(&(instance->q), data, sizeof(Quaternion));
 
         #if COMM_DEBUG

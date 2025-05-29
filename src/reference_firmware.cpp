@@ -6,7 +6,8 @@
 #include <quatern_eskf.h>
 #include "remote_sensor.h"
 
-#define EULER_DEBUG 1
+#define EULER_DEBUG 0
+#define DIFF_DEBUG 1
 
 hw_timer_t *timer = NULL;
 volatile bool kf_run = false;
@@ -32,7 +33,7 @@ void setup() {
   
   Wire.begin(21, 22);
   Wire.setClock(400000);
-  delay(4000);
+  delay(8000);
   imu.setup();
 
   // Find MAC address
@@ -56,7 +57,7 @@ unsigned long euler_time = micros();
 char buf[30];
 void loop() {
   
-  if (kf_run) {
+  if (kf_run && !RemoteSensor::meas_lock) {
     readtime = micros();
     kf_run = false;
     ImuData imud = imu.imu_read();
@@ -75,8 +76,14 @@ void loop() {
     euler.print(buf);
     Serial.println(buf);
     #endif
+
+    #if DIFF_DEBUG
+    Quaternion qdiff = eskf.state.q.inv() * meas.q;
+    MSVector3 euler = qdiff.to_euler()*(180.0f/M_PI);
+    euler.print(buf);
+    Serial.println(buf);
+    #endif
     
   }
-    
- 
+
 }

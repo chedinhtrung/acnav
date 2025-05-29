@@ -8,8 +8,9 @@
 class RemoteSensor {
     public:
     static RemoteSensor* instance;
-    Quaternion q; 
+    Quaternion q = Quaternion(1.0f,0.0f,0.0f,0.0f); 
     unsigned long last_sync = -1;
+    static bool meas_lock;
 
     esp_err_t init();
     

@@ -6,7 +6,9 @@
 #include <quatern_eskf.h>
 #include "remote_sensor.h"
 
-#define EULER_DEBUG 1
+#define EULER_DEBUG 0
+#define PYLOG 1
+
 
 hw_timer_t *timer = NULL;
 volatile bool kf_run = false;
@@ -59,7 +61,11 @@ void loop() {
     readtime = micros();
     kf_run = false;
     ImuData imud = imu.imu_read();
-    //Serial.write((byte*)&imud, sizeof(ImuData));
+    
+    #if PYLOG
+    Serial.write((byte*)&imud, sizeof(ImuData));
+    #endif
+
     eskf.propagate(imud.gyro, DT*1e-3);
     eskf.update(imud.accel);
     delta = micros()-readtime;
@@ -69,7 +75,7 @@ void loop() {
     last_update = millis();
     euler_time = micros();
     
-    #ifdef EULER_DEBUG
+    #if EULER_DEBUG
     MSVector3 euler = eskf.state.q.to_euler()*(180.0f/M_PI);
     euler.print(buf);
     Serial.println(buf);

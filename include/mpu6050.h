@@ -12,7 +12,7 @@ class MPU6050_Imu {
         
        
         # ifdef REFERENCE
-        MSVector3 accel_offset = MSVector3(0.019f,0.0005f,0.118f);
+        MSVector3 accel_offset = MSVector3(0.016f,-0.0015f,0.124f);
         #endif
         #ifdef MEASURE
         MSVector3 accel_offset = MSVector3(0.05f,0.0f,0.13f);

@@ -27,6 +27,7 @@ void QErrorState::reset(){
 }
 
 QEskf::QEskf() {
+    P(2,2) = 5e-7;
 }
 
 void QEskf::propagate(MSVector3 gyro, float dt){
