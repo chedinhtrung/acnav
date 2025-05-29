@@ -37,12 +37,13 @@ void QEskf::propagate(MSVector3 gyro, float dt){
     error_state.propagate(state, gyro, dt);
     
     BLA::Matrix<3,3,float> F = (gyro * dt).to_dq().T().to_R();
-
-    BLA::Matrix<3,3,float> Q_i = BLA::Eye<3,3,float>()*1e-2f*KF_DT*KF_DT * gyro_norm; // Account for quantization error in integration. 
-                                                                                      // This error is proportional to angular vel
     
     // Covar matrix P propagate 
-    P = (~F) * P * F + Q + Q_i;
+    P = (~F) * P * F + Q;
+
+    if (P(2,2) > 1e-6){
+        P(2,2) = 1e-6;
+    }
 }
 
 void QEskf::update(MSVector3 accel){

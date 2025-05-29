@@ -6,11 +6,11 @@
 #include "WiFi.h"
 
 class RemoteSensor {
+    public:
     static RemoteSensor* instance;
     Quaternion q; 
     unsigned long last_sync = -1;
 
-    public:
     esp_err_t init();
     
     #ifdef REFERENCE
