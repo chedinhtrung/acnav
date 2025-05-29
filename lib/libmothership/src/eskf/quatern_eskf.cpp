@@ -27,6 +27,7 @@ void QErrorState::reset(){
 }
 
 QEskf::QEskf() {
+    P(2,2) = 1e-8;
 }
 
 void QEskf::propagate(MSVector3 gyro, float dt){
@@ -39,6 +40,11 @@ void QEskf::propagate(MSVector3 gyro, float dt){
     
     // Covar matrix P propagate 
     P = (~F) * P * F + Q;
+
+    if (P(2,2) > 1e-6){
+        P(2,2) = 1e-6;
+    }
+    
 }
 
 void QEskf::update(MSVector3 accel){
