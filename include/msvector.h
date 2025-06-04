@@ -2,7 +2,7 @@
 #define MSVECTOR
 
 // Just some reimplemented Vector3 for convenience
-#include "BasicLinearAlgebra/BasicLinearAlgebra.h"
+#include "BasicLinearAlgebra.h"
 
 struct Quaternion;
 

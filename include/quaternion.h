@@ -3,7 +3,7 @@
 
 #define EQ_EPSILON 1e-6
 
-#include "BasicLinearAlgebra/BasicLinearAlgebra.h"
+#include "BasicLinearAlgebra.h"
 #include "msvector.h"
 
 
