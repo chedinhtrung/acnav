@@ -6,8 +6,8 @@
 #include <quatern_eskf.h>
 #include "remote_sensor.h"
 
-#define EULER_DEBUG 0
-#define PYLOG 1
+#define EULER_DEBUG 1
+#define PYLOG 0
 
 
 hw_timer_t *timer = NULL;
@@ -66,9 +66,11 @@ void loop() {
     Serial.write((byte*)&imud, sizeof(ImuData));
     #endif
 
+    #if !PYLOG
     eskf.propagate(imud.gyro, DT*1e-3);
     eskf.update(imud.accel);
     //delta = micros()-readtime;
+    #endif
   }
   
   if (millis() - last_update > 50){

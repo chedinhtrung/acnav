@@ -78,27 +78,29 @@ class Eskf:
         self.state = State()
         self.error_state = ErrorState()    
 
-        self.accel_var = np.square(0.01)                 *np.eye(3,3)
-        self.A_i = 1e-8                     *DT*np.eye(3,3)
-        self.Theta_i = np.square(0.5/180*3.14159)        *DT*DT*np.eye(3,3)
-        self.Omega_i = 1e-10                *DT* np.eye(3,3)
+        self.accel_var = np.square(0.005)                *np.eye(3,3)
+        self.A_i =       1e-10                           *DT*np.eye(3,3)
+        self.Theta_i = np.square(1/180*3.14159)          *DT*DT*np.eye(3,3)
+        self.Omega_i = 1e-12                              *DT* np.eye(3,3)
 
         self.flat_var = np.square(5.0/180*3.14159)       *np.eye(3,3)
 
         self.F = np.eye(9,9)
         self.P = np.eye(9,9)
         self.Q = np.eye(9,9)
-        #self.Ra = np.eye(9,9) * self.accel_var
+        self.H = None
 
         # Construct Q
+        self.flat_var[2][2] /= 1e4
         self.Q[:3, :3] = self.Theta_i
         self.Q[3:6, 3:6] = self.A_i
         self.Q[6:9, 6:9] = self.Omega_i
 
         # Construct P
         self.P[:3, :3] = self.flat_var
-        self.P[3:6, 3:6] = self.A_i
-        self.P[6:9, 6:9] = self.Omega_i
+        self.P[2][2] = 1e-6
+        self.P[3:6, 3:6] = self.A_i * 1e-2
+        self.P[6:9, 6:9] = self.Omega_i * 1e-2
 
     def propagate(self, gyro:np.array, dt:float):
         """
@@ -115,6 +117,8 @@ class Eskf:
         self.F[:3, 6:9] = -dt * np.eye(3,3)
 
         self.P = self.F.T @ self.P @ self.F + self.Q
+        if self.P[2][2] > 1e-6:
+            self.P[2][2] = 1e-6
 
     def update(self, accel:np.array):
         linear_accel_var = np.square(np.linalg.norm(accel) - 1)
@@ -125,11 +129,34 @@ class Eskf:
         H[:3, :3] = skew(RT_q_g)
         H[:3, 3:6] = np.eye(3,3)
 
-        K = self.P @ H.T @ np.linalg.inv((H @ self.P @ H.T + V))
-        self.error_state.statevect += K @ (accel - (RT_q_g.reshape(3,1) + self.state.ab))
-        I = np.eye(9,9, dtype="float")
-        self.P = (I - K @ H) @ self.P @ (I - K @ H).T + K @ self.accel_var @ K.T
+        w,x,y,z = self.state.q.w, self.state.q.x, self.state.q.y, self.state.q.z
 
+        H_xq = np.array([ 
+            [y, -z, w, -x],
+            [-x, -w, -z, -y],
+            [-w, x, y, -z]
+        ])
+
+        Q_dtheta = np.array([
+            [-x, -y, -z],
+            [w, -z, y],
+            [z, w,-x],
+            [-y, x, w]
+        ])
+
+        H_x = np.hstack((H_xq, np.eye(3,3), np.zeros((3,3))))
+        X_dx = np.vstack([np.hstack([Q_dtheta, np.zeros((4,6))]), np.hstack([np.zeros((6,3)), np.eye(6,6)])])
+        
+        self.H = H_x @ X_dx 
+
+        K = self.P @ self.H.T @ np.linalg.inv((self.H @ self.P @ self.H.T + V))
+        self.error_state.statevect += K @ (accel - (RT_q_g.reshape(3,1) + self.state.ab))
+        I = np.eye(9,9, dtype=np.float32)
+        self.P = (I - K @ self.H) @ self.P @ (I - K @ self.H).T + K @ V @ K.T
+
+
+
+    def inject(self):
         self.state.update(self.error_state)
         self.error_state.reset()
 

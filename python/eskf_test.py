@@ -39,11 +39,13 @@ while True:
         print("\033[2J\033[H", end='')
         last_read = time.perf_counter()
         euler = quat_to_euler_zyx(eskf.state.q) * 180 / 3.14159
-        print(f"\r{eskf.P} \n \n",end='', flush=True)
-        print(f"\r{eskf.H} \n \n",end='', flush=True)
-        print(f"\r{eskf.state.q} \n \n",end='', flush=True)
-        print(f"\r{euler} \n \n",end='', flush=True)
-        #print(eskf.error_state.dtheta)
+        print(f"{euler} \n \n")
+        #print(f"\r{eskf.P} \n \n",end='', flush=True)
+        #print(f"\r{eskf.H} \n \n",end='', flush=True)
+        #print(f"\r{eskf.state.q} \n \n",end='', flush=True)
+        #print(f"\r{euler} \n \n",end='', flush=True)
+        #print(f"{eskf.state.wb} \n \n")
+        #print(f"{eskf.state.ab} \n \n")
         #print(f"{eskf.max_index}   {eskf.debug_froben_norm}")
     
     eskf.inject()

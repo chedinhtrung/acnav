@@ -15,7 +15,7 @@ def skew(vec:np.array):
 
 class IMUReader:
     def __init__(self):
-        self.ser = serial.Serial("/dev/ttyUSB0", 115200)
+        self.ser = serial.Serial("/dev/ttyUSB1", 115200)
 
     def read(self): # Returns 6DOF IMU reading
         size = struct.calcsize("<6f")
